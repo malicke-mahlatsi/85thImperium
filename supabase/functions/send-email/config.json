@@ -1,0 +1,13 @@
+{
+  "name": "send-email",
+  "version": "1.0.0",
+  "description": "Email notification function for contact form submissions",
+  "runtime": "deno",
+  "entrypoint": "index.ts",
+  "environment": {
+    "SMTP_HOST": "smtp.gmail.com",
+    "SMTP_PORT": "587",
+    "SMTP_USER": "mahlatsi.malicke76@gmail.com",
+    "SMTP_PASS": "erxr owre tsoz yasn"
+  }
+}

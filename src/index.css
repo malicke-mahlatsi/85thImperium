@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --beige: #f5f0e1;
+  --light-gray: #e5e5e5;
+  --deep-teal: #1a3c34;
+  --muted-gold: #b89c5e;
+  --soft-pink: #ffd6e0;
+  --y2k-pink: #ff69b4;
+  --cyber-blue: #4dc9ff;
+  --elegant-purple: #9d4edd;
+}
+
+@layer base {
+  body {
+    @apply antialiased font-montserrat;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-montserrat font-semibold tracking-tight;
+  }
+}
+
+@layer components {
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm;
+  }
+
+  .modal-content {
+    @apply bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all;
+  }
+
+  .elegant-button {
+    @apply px-6 py-2.5 bg-deep-teal text-white rounded hover:bg-opacity-90 transition-all duration-300 font-medium tracking-wide;
+  }
+
+  .elegant-card {
+    @apply bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300;
+  }
+
+  .three-canvas {
+    @apply absolute top-0 left-0 w-full h-full pointer-events-none;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-deep-teal to-muted-gold;
+  }
+
+  .text-gradient-y2k {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-y2k-pink via-cyber-blue to-elegant-purple;
+  }
+
+  .bg-gradient-elegant {
+    @apply bg-gradient-to-br from-beige to-white dark:from-gray-900 dark:to-black;
+  }
+
+  .bg-gradient-y2k {
+    @apply bg-gradient-to-br from-y2k-pink/[0.1] via-cyber-blue/[0.1] to-elegant-purple/[0.1];
+  }
+
+  .hover-lift {
+    @apply transform transition-transform duration-300 hover:-translate-y-1;
+  }
+}
