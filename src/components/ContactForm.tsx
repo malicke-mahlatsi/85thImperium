@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 import { supabase } from '../lib/supabase';
 
@@ -16,6 +17,7 @@ const ContactForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const mountRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,30 +30,47 @@ const ContactForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
       antialias: true 
     });
 
-    renderer.setSize(60, 60);
+    renderer.setSize(120, 120);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     mountRef.current.appendChild(renderer.domElement);
 
-    const geometry = new THREE.IcosahedronGeometry(1, 0);
-    const material = new THREE.MeshBasicMaterial({ 
-      color: 0xff69b4,
-      wireframe: true 
+    const geometry = new THREE.TorusKnotGeometry(1, 0.3, 100, 16);
+    const material = new THREE.MeshPhongMaterial({ 
+      color: 0xD4AF37,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.8,
+      shininess: 100
     });
-    const icosahedron = new THREE.Mesh(geometry, material);
     
-    scene.add(icosahedron);
-    camera.position.z = 3;
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 5, 5);
+    scene.add(directionalLight);
+
+    camera.position.z = 4;
 
     const animate = () => {
       requestAnimationFrame(animate);
-      icosahedron.rotation.x += 0.01;
-      icosahedron.rotation.y += 0.01;
+      torusKnot.rotation.x += 0.01;
+      torusKnot.rotation.y += 0.02;
       renderer.render(scene, camera);
     };
 
     animate();
 
     return () => {
-      mountRef.current?.removeChild(renderer.domElement);
+      if (mountRef.current?.contains(renderer.domElement)) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
+      geometry.dispose();
+      material.dispose();
+      renderer.dispose();
     };
   }, []);
 
@@ -67,10 +86,13 @@ const ContactForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
       if (supabaseError) throw supabaseError;
 
-      setFormData({ name: '', email: '', message: '' });
-      onClose();
+      setSuccess(true);
+      setTimeout(() => {
+        setFormData({ name: '', email: '', message: '' });
+        onClose();
+      }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred while submitting the form');
+      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -85,88 +107,136 @@ const ContactForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-pink-100 to-white dark:from-pink-900 dark:to-gray-900 rounded-2xl shadow-2xl max-w-md w-full transform transition-all">
-        <div className="p-8">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-500">
-                Let's Connect
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
-                Drop us a message and we'll get back to you
-              </p>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-imperial-blue/80 dark:bg-imperial-charcoal/80 backdrop-blur-md flex items-center justify-center p-4 z-50"
+        onClick={(e) => e.target === e.currentTarget && onClose()}
+      >
+        <motion.div
+          initial={{ scale: 0.95, y: 20 }}
+          animate={{ scale: 1, y: 0 }}
+          exit={{ scale: 0.95, y: 20 }}
+          className="bg-gradient-to-br from-imperial-blue/95 to-imperial-charcoal/95 dark:from-white/95 dark:to-gray-100/95 rounded-2xl shadow-2xl max-w-lg w-full border border-imperial-gold/20 overflow-hidden"
+        >
+          <div className="p-8">
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <h2 className="text-3xl font-cinzel font-bold text-imperial-gold mb-2 animate-glow">
+                  Get in Touch
+                </h2>
+                <p className="text-imperial-ivory/80 dark:text-imperial-charcoal/80 font-montserrat">
+                  Let's discuss your next breakthrough innovation
+                </p>
+              </div>
+              <div ref={mountRef} className="w-24 h-24" />
             </div>
-            <div ref={mountRef} className="w-16 h-16" />
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 p-4 rounded-lg bg-imperial-crimson/10 border border-imperial-crimson/30 text-imperial-crimson"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            {success ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center py-8"
+              >
+                <div className="text-imperial-gold text-4xl mb-4">✓</div>
+                <h3 className="text-2xl font-cinzel text-imperial-gold mb-2">Message Sent!</h3>
+                <p className="text-imperial-ivory/80 dark:text-imperial-charcoal/80">We'll be in touch shortly.</p>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Your Name"
+                    className="elegant-input"
+                    required
+                    disabled={isSubmitting}
+                    minLength={2}
+                    maxLength={100}
+                  />
+                </div>
+
+                <div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Your Email"
+                    className="elegant-input"
+                    required
+                    disabled={isSubmitting}
+                    pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                  />
+                </div>
+
+                <div>
+                  <textarea
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
+                    placeholder="Your Message"
+                    rows={4}
+                    className="elegant-input resize-none"
+                    required
+                    disabled={isSubmitting}
+                    minLength={10}
+                    maxLength={1000}
+                  />
+                </div>
+
+                <div className="flex gap-4 pt-2">
+                  <motion.button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="elegant-button flex-1"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Sending...
+                      </span>
+                    ) : (
+                      'Send Message'
+                    )}
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={onClose}
+                    disabled={isSubmitting}
+                    className="px-6 py-2.5 border-2 border-imperial-gold text-imperial-gold rounded-lg hover:bg-imperial-gold/5 transition-colors duration-300 flex-1 font-medium"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Cancel
+                  </motion.button>
+                </div>
+              </form>
+            )}
           </div>
-
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 rounded-lg">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Your Name"
-                className="w-full p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 border-2 border-pink-200 dark:border-pink-800 focus:border-pink-500 dark:focus:border-pink-400 focus:outline-none transition-colors placeholder-gray-500 dark:placeholder-gray-400"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="Your Email"
-                className="w-full p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 border-2 border-pink-200 dark:border-pink-800 focus:border-pink-500 dark:focus:border-pink-400 focus:outline-none transition-colors placeholder-gray-500 dark:placeholder-gray-400"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                placeholder="Your Message"
-                rows={4}
-                className="w-full p-3 rounded-lg bg-white/50 dark:bg-gray-800/50 border-2 border-pink-200 dark:border-pink-800 focus:border-pink-500 dark:focus:border-pink-400 focus:outline-none transition-colors placeholder-gray-500 dark:placeholder-gray-400 resize-none"
-                required
-                disabled={isSubmitting}
-              />
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="flex-1 py-3 px-6 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {isSubmitting ? 'Sending...' : 'Send Message'}
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isSubmitting}
-                className="py-3 px-6 border-2 border-pink-500 text-pink-500 font-bold rounded-lg hover:bg-pink-50 dark:hover:bg-pink-950 transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 

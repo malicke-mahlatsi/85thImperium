@@ -1,70 +1,257 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --beige: #f5f0e1;
-  --light-gray: #e5e5e5;
-  --deep-teal: #1a3c34;
-  --muted-gold: #b89c5e;
-  --soft-pink: #ffd6e0;
-  --y2k-pink: #ff69b4;
-  --cyber-blue: #4dc9ff;
-  --elegant-purple: #9d4edd;
+  /* Imperial color palette */
+  --imperial-blue: #1A2A44;
+  --imperial-gold: #D4AF37;
+  --imperial-charcoal: #333333;
+  --imperial-crimson: #8B0000;
+  --imperial-ivory: #F5F5F5;
+  
+  /* Legacy colors */
+  --space-black: #0a0a0a;
+  --deep-space: #1a1a2e;
+  --tech-blue: #2d5af6;
+  --cyber-purple: #7209b7;
+  --neon-blue: #00f7ff;
+  --neon-purple: #b537f2;
+  --silver: #e5e5e5;
+  --frost: rgba(255, 255, 255, 0.1);
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    @apply antialiased font-montserrat;
+    @apply antialiased bg-imperial-blue dark:bg-white text-imperial-ivory dark:text-imperial-charcoal font-montserrat min-h-screen transition-colors duration-300;
+    text-rendering: optimizeLegibility;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-montserrat font-semibold tracking-tight;
+    @apply font-cinzel text-imperial-gold dark:text-imperial-blue tracking-wide transition-colors duration-300;
+  }
+
+  section {
+    @apply scroll-mt-24;
+  }
+
+  ::selection {
+    @apply bg-imperial-gold/30 text-imperial-ivory dark:text-imperial-blue;
   }
 }
 
 @layer components {
   .modal-overlay {
-    @apply fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm;
+    @apply fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 z-50;
   }
 
   .modal-content {
-    @apply bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-md w-full mx-auto transform transition-all;
+    @apply outline-none max-w-2xl w-full mx-auto;
   }
 
   .elegant-button {
-    @apply px-6 py-2.5 bg-deep-teal text-white rounded hover:bg-opacity-90 transition-all duration-300 font-medium tracking-wide;
+    @apply px-6 py-3 rounded-lg font-montserrat font-medium
+           bg-gradient-to-r from-imperial-crimson to-imperial-crimson/90
+           text-imperial-ivory shadow-lg
+           hover:from-imperial-crimson/90 hover:to-imperial-crimson
+           transition-all duration-300 transform hover:scale-[1.02]
+           active:scale-[0.98] focus:outline-none focus:ring-2
+           focus:ring-imperial-gold/50 focus:ring-offset-2
+           focus:ring-offset-imperial-blue disabled:opacity-50
+           disabled:cursor-not-allowed dark:text-white 
+           dark:ring-offset-white backdrop-blur-sm;
   }
 
   .elegant-card {
-    @apply bg-white dark:bg-gray-900 rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300;
+    @apply bg-gradient-to-br from-imperial-charcoal/5 to-imperial-charcoal/10
+           backdrop-blur-md rounded-xl overflow-hidden
+           border border-imperial-gold/10 shadow-xl
+           hover:border-imperial-gold/30 transition-all duration-500
+           group-hover:shadow-2xl p-6 md:p-8
+           dark:from-imperial-blue/5 dark:to-imperial-blue/10
+           dark:bg-white/95 hover:scale-105
+           hover:shadow-imperial-gold/20 dark:hover:shadow-imperial-blue/20;
   }
 
-  .three-canvas {
-    @apply absolute top-0 left-0 w-full h-full pointer-events-none;
+  .elegant-input {
+    @apply w-full bg-imperial-charcoal/30 border-2 border-imperial-gold/20
+           rounded-lg px-4 py-3 text-imperial-ivory dark:text-imperial-charcoal
+           placeholder:text-imperial-ivory/40 dark:placeholder:text-imperial-charcoal/40
+           focus:border-imperial-gold focus:ring-1 focus:ring-imperial-gold/50
+           transition-all duration-300 font-montserrat outline-none
+           disabled:opacity-50 disabled:cursor-not-allowed
+           dark:bg-white/90 backdrop-blur-sm
+           focus:shadow-lg focus:shadow-imperial-gold/20
+           dark:focus:shadow-imperial-blue/20;
+  }
+
+  .logo-container {
+    @apply relative w-16 h-16 rounded-full
+           bg-gradient-to-br from-imperial-gold to-imperial-gold/80
+           shadow-lg shadow-imperial-gold/20
+           flex items-center justify-center
+           transform transition-all duration-500
+           hover:shadow-xl hover:shadow-imperial-gold/30
+           before:content-[''] before:absolute before:inset-0
+           before:rounded-full before:border-2 before:border-imperial-gold/30
+           before:animate-pulse hover:rotate-12;
+  }
+
+  .logo-text {
+    @apply font-cinzel font-bold text-2xl text-imperial-blue
+           tracking-wider z-10 transform transition-all duration-500
+           group-hover:scale-110 select-none;
+  }
+
+  .nav-link {
+    @apply relative font-montserrat text-imperial-ivory/90 dark:text-imperial-charcoal/90
+           hover:text-imperial-gold dark:hover:text-imperial-blue 
+           transition-colors duration-300 py-1
+           after:content-[''] after:absolute after:bottom-0 after:left-0
+           after:w-0 after:h-0.5 after:bg-imperial-gold dark:after:bg-imperial-blue
+           after:transition-all after:duration-300 after:ease-out
+           hover:after:w-full;
+  }
+
+  .theme-toggle {
+    @apply w-12 h-12 rounded-full 
+           bg-gradient-to-br from-imperial-gold/20 to-imperial-gold/10
+           hover:from-imperial-gold/30 hover:to-imperial-gold/20
+           flex items-center justify-center
+           transition-all duration-300 transform
+           hover:scale-110 active:scale-95
+           border border-imperial-gold/30
+           hover:border-imperial-gold/50
+           shadow-lg hover:shadow-xl
+           backdrop-blur-sm dark:from-imperial-blue/20 
+           dark:to-imperial-blue/10 dark:border-imperial-blue/30 
+           dark:hover:border-imperial-blue/50;
+  }
+
+  .theme-icon {
+    @apply text-imperial-gold dark:text-imperial-blue text-xl
+           transition-all duration-300
+           transform rotate-0 hover:rotate-180;
+  }
+
+  .floating {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .text-shadow {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite;
+  }
+
+  .cursor-dot {
+    @apply fixed w-2 h-2 bg-imperial-gold rounded-full pointer-events-none z-50
+           mix-blend-screen dark:bg-imperial-blue;
+  }
+
+  .cursor-outline {
+    @apply fixed w-8 h-8 border-2 border-imperial-gold rounded-full pointer-events-none z-50
+           mix-blend-screen dark:border-imperial-blue;
+  }
+
+  .cloud {
+    @apply absolute bg-white rounded-full opacity-80 blur-lg;
+  }
+
+  .project-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8
+           [perspective:1000px];
+  }
+
+  .project-card {
+    @apply transform-gpu transition-all duration-500
+           hover:[transform:rotateX(10deg)_rotateY(10deg)]
+           hover:shadow-2xl;
+  }
+
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/10 dark:bg-black/5
+           border border-white/20 dark:border-black/10
+           rounded-xl shadow-xl;
   }
 }
 
-@layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-deep-teal to-muted-gold;
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    text-shadow: 0 0 10px rgba(212, 175, 55, 0.5),
+                 0 0 20px rgba(212, 175, 55, 0.3),
+                 0 0 30px rgba(212, 175, 55, 0.2);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.8),
+                 0 0 30px rgba(212, 175, 55, 0.5),
+                 0 0 40px rgba(212, 175, 55, 0.3);
+  }
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 640px) {
+  .elegant-card {
+    @apply p-4;
   }
 
-  .text-gradient-y2k {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-y2k-pink via-cyber-blue to-elegant-purple;
+  .logo-container {
+    @apply w-12 h-12;
   }
 
-  .bg-gradient-elegant {
-    @apply bg-gradient-to-br from-beige to-white dark:from-gray-900 dark:to-black;
+  .logo-text {
+    @apply text-xl;
   }
 
-  .bg-gradient-y2k {
-    @apply bg-gradient-to-br from-y2k-pink/[0.1] via-cyber-blue/[0.1] to-elegant-purple/[0.1];
+  .theme-toggle {
+    @apply w-10 h-10;
   }
 
-  .hover-lift {
-    @apply transform transition-transform duration-300 hover:-translate-y-1;
+  .theme-icon {
+    @apply text-base;
+  }
+}
+
+/* Tablet Optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .project-grid {
+    @apply grid-cols-2;
+  }
+
+  .elegant-card {
+    @apply p-6;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .elegant-button,
+  .theme-toggle,
+  .nav-link {
+    @apply hidden;
+  }
+
+  body {
+    @apply text-black bg-white;
+  }
+
+  .elegant-card {
+    @apply shadow-none border-black/10 break-inside-avoid;
   }
 }
